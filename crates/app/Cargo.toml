@@ -1,0 +1,21 @@
+[package]
+name = "code-daily-quest"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+chrono.workspace = true
+clap.workspace = true
+crossterm.workspace = true
+flate2.workspace = true
+ratatui.workspace = true
+reqwest.workspace = true
+semver.workspace = true
+serde.workspace = true
+sha2.workspace = true
+tar.workspace = true
+tempfile.workspace = true
+tokio.workspace = true
+code-daily-quest-core = { path = "../core" }
