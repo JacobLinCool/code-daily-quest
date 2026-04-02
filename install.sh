@@ -5,6 +5,15 @@ REPOSITORY="${CODE_DAILY_QUEST_REPO:-JacobLinCool/code-daily-quest}"
 INSTALL_DIR="${CODE_DAILY_QUEST_INSTALL_DIR:-$HOME/.local/bin}"
 VERSION="${CODE_DAILY_QUEST_VERSION:-latest}"
 BINARY_NAME="code-daily-quest"
+TEMP_DIR=""
+
+cleanup() {
+  if [[ -n "${TEMP_DIR:-}" && -d "${TEMP_DIR}" ]]; then
+    rm -rf "${TEMP_DIR}"
+  fi
+}
+
+trap cleanup EXIT
 
 detect_target() {
   local os arch
@@ -61,11 +70,10 @@ main() {
     checksum_url="https://github.com/${REPOSITORY}/releases/download/${version_prefix}/${checksum}"
   fi
 
-  local temp_dir archive_path checksum_path expected actual
-  temp_dir="$(mktemp -d)"
-  trap 'rm -rf "${temp_dir}"' EXIT
-  archive_path="${temp_dir}/${archive}"
-  checksum_path="${temp_dir}/${checksum}"
+  local archive_path checksum_path expected actual
+  TEMP_DIR="$(mktemp -d)"
+  archive_path="${TEMP_DIR}/${archive}"
+  checksum_path="${TEMP_DIR}/${checksum}"
 
   download "${archive_url}" "${archive_path}"
   download "${checksum_url}" "${checksum_path}"
@@ -80,8 +88,8 @@ main() {
   fi
 
   mkdir -p "${INSTALL_DIR}"
-  tar -xzf "${archive_path}" -C "${temp_dir}"
-  install -m 0755 "${temp_dir}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
+  tar -xzf "${archive_path}" -C "${TEMP_DIR}"
+  install -m 0755 "${TEMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
 
   echo "installed ${BINARY_NAME} to ${INSTALL_DIR}/${BINARY_NAME}"
   echo "run '${BINARY_NAME} doctor' to verify local log discovery"
