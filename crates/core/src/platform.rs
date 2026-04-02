@@ -1,9 +1,16 @@
-use std::fs;
 use std::path::Path;
+
+use anyhow::{Result, bail};
+use chrono::NaiveDate;
+
+#[cfg(target_os = "macos")]
+use std::fs;
+#[cfg(target_os = "macos")]
 use std::process::{Command, Output, Stdio};
 
-use anyhow::{Context, Result, bail};
-use chrono::NaiveDate;
+#[cfg(target_os = "macos")]
+use anyhow::Context;
+#[cfg(target_os = "macos")]
 use serde::Serialize;
 
 use crate::model::DailyQuest;
@@ -35,10 +42,10 @@ pub fn default_notifier() -> Box<dyn Notifier> {
     }
 }
 
-pub fn default_autostart_installer(paths: &AppPaths) -> Box<dyn AutostartInstaller> {
+pub fn default_autostart_installer(_paths: &AppPaths) -> Box<dyn AutostartInstaller> {
     #[cfg(target_os = "macos")]
     {
-        Box::new(LaunchdInstaller::new(paths.clone()))
+        Box::new(LaunchdInstaller::new(_paths.clone()))
     }
     #[cfg(not(target_os = "macos"))]
     {
